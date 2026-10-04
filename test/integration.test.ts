@@ -89,7 +89,8 @@ describe("buildSnapshotArgs", () => {
 
 describe("enpass-cli against the test vault", () => {
   itWithCli("checkCli runs version without credentials", async () => {
-    await expect(checkCli(CLI!)).resolves.toContain("1.14.0");
+    // Version-agnostic: brew is rolling, CI runners install newer releases.
+    await expect(checkCli(CLI!)).resolves.toMatch(/version=\d+\.\d+\.\d+/);
   });
 
   itWithCli("snapshots the test vault with MASTERPW env", async () => {
