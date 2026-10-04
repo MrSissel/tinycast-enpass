@@ -1,4 +1,13 @@
-import { Action, ActionPanel, Form, Icon, List, showToast, Toast, useNavigation } from "@raycast/api";
+import {
+  Action,
+  ActionPanel,
+  Form,
+  Icon,
+  List,
+  showToast,
+  Toast,
+  useNavigation,
+} from "@raycast/api";
 import { useEffect, useState } from "react";
 import { prefs } from "./prefs";
 import { PasswordRequiredError, unlock } from "./unlock";
@@ -24,12 +33,19 @@ export function unlockErrorText(e: unknown): string {
   return msg;
 }
 
-export async function runUnlock(masterPassword: string | undefined, onSuccess: (itemCount: number) => Promise<void>): Promise<void> {
+export async function runUnlock(
+  masterPassword: string | undefined,
+  onSuccess: (itemCount: number) => Promise<void>,
+): Promise<void> {
   try {
     const itemCount = await unlock(masterPassword);
     await onSuccess(itemCount);
   } catch (e) {
-    await showToast({ style: Toast.Style.Failure, title: "Unlock failed", message: unlockErrorText(e) });
+    await showToast({
+      style: Toast.Style.Failure,
+      title: "Unlock failed",
+      message: unlockErrorText(e),
+    });
   }
 }
 
@@ -37,14 +53,21 @@ export async function runUnlock(masterPassword: string | undefined, onSuccess: (
 // MASTERPW set, enpass-cli skips store.Read (no fingerprint needed this once),
 // unlocks with the password and writes the derived key to the Keychain —
 // afterwards Touch ID alone unlocks.
-export function PasswordUnlockForm(props: { pushed: boolean; onSuccess: (itemCount: number) => Promise<void> }) {
+export function PasswordUnlockForm(props: {
+  pushed: boolean;
+  onSuccess: (itemCount: number) => Promise<void>;
+}) {
   const { pop } = useNavigation();
   const [isUnlocking, setIsUnlocking] = useState(false);
   const method = prefs().unlockMethod;
   return (
     <Form
       isLoading={isUnlocking}
-      navigationTitle={method === "touchid" ? "Master Password (Touch ID Setup)" : "Unlock with Master Password"}
+      navigationTitle={
+        method === "touchid"
+          ? "Master Password (Touch ID Setup)"
+          : "Unlock with Master Password"
+      }
       actions={
         <ActionPanel>
           <Action.SubmitForm
@@ -52,7 +75,10 @@ export function PasswordUnlockForm(props: { pushed: boolean; onSuccess: (itemCou
             onSubmit={async (values: { password?: string }) => {
               const password = values.password ?? "";
               if (!password) {
-                await showToast({ style: Toast.Style.Failure, title: "Master password required" });
+                await showToast({
+                  style: Toast.Style.Failure,
+                  title: "Master password required",
+                });
                 return;
               }
               setIsUnlocking(true);
@@ -68,7 +94,12 @@ export function PasswordUnlockForm(props: { pushed: boolean; onSuccess: (itemCou
         </ActionPanel>
       }
     >
-      <Form.PasswordField id="password" title="Master Password" placeholder="Enpass master password" autoFocus />
+      <Form.PasswordField
+        id="password"
+        title="Master Password"
+        placeholder="Enpass master password"
+        autoFocus
+      />
       <Form.Description
         text={
           method === "touchid"
@@ -84,7 +115,10 @@ export function PasswordUnlockForm(props: { pushed: boolean; onSuccess: (itemCou
 
 // NOTE: the unlock action must be a real List.Item — List.EmptyView actions
 // don't fire under Tinycast (↩ on an empty screen does nothing there).
-export function LockedList(props: { autoStart: boolean; onSuccess: (itemCount: number) => Promise<void> }) {
+export function LockedList(props: {
+  autoStart: boolean;
+  onSuccess: (itemCount: number) => Promise<void>;
+}) {
   const [isUnlocking, setIsUnlocking] = useState(false);
   const method = prefs().unlockMethod;
 
@@ -96,7 +130,6 @@ export function LockedList(props: { autoStart: boolean; onSuccess: (itemCount: n
 
   useEffect(() => {
     if (props.autoStart && method === "touchid") void unlockTouchId();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (method === "masterpw-keychain") {
@@ -120,7 +153,11 @@ export function LockedList(props: { autoStart: boolean; onSuccess: (itemCount: n
         subtitle="Scan your fingerprint — searching afterwards is instant"
         actions={
           <ActionPanel>
-            <Action title="Unlock with Touch ID" icon={Icon.Lock} onAction={unlockTouchId} />
+            <Action
+              title="Unlock with Touch ID"
+              icon={Icon.Lock}
+              onAction={unlockTouchId}
+            />
           </ActionPanel>
         }
       />
@@ -138,14 +175,20 @@ export function LockedList(props: { autoStart: boolean; onSuccess: (itemCount: n
           </ActionPanel>
         }
       />
-      <List.EmptyView icon={Icon.Lock} title="Vault Locked" description="Clear the search field to get back to the unlock action." />
+      <List.EmptyView
+        icon={Icon.Lock}
+        title="Vault Locked"
+        description="Clear the search field to get back to the unlock action."
+      />
     </List>
   );
 }
 
 // masterpw-keychain: one silent unlock attempt from the stored Keychain item
 // (prompt-free); only when it is missing or stale does the form appear.
-function KeychainUnlock(props: { onSuccess: (itemCount: number) => Promise<void> }) {
+function KeychainUnlock(props: {
+  onSuccess: (itemCount: number) => Promise<void>;
+}) {
   const [needsPassword, setNeedsPassword] = useState(false);
   useEffect(() => {
     void (async () => {
@@ -153,15 +196,19 @@ function KeychainUnlock(props: { onSuccess: (itemCount: number) => Promise<void>
         await props.onSuccess(await unlock());
       } catch (e) {
         if (!(e instanceof PasswordRequiredError)) {
-          await showToast({ style: Toast.Style.Failure, title: "Unlock failed", message: unlockErrorText(e) });
+          await showToast({
+            style: Toast.Style.Failure,
+            title: "Unlock failed",
+            message: unlockErrorText(e),
+          });
         }
         setNeedsPassword(true);
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (needsPassword) return <PasswordUnlockForm pushed={false} onSuccess={props.onSuccess} />;
+  if (needsPassword)
+    return <PasswordUnlockForm pushed={false} onSuccess={props.onSuccess} />;
   return (
     <List isLoading>
       <List.EmptyView icon={Icon.Lock} title="Unlocking…" />

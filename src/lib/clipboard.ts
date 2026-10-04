@@ -15,7 +15,11 @@ export interface PendingClear {
 
 // Schedules "clear the clipboard in `seconds` if it still holds `text`".
 // If the user copied something else in the meantime, the clipboard is left alone.
-export function scheduleClipboardClear(text: string, seconds: number, fx: ClipboardEffects): PendingClear {
+export function scheduleClipboardClear(
+  text: string,
+  seconds: number,
+  fx: ClipboardEffects,
+): PendingClear {
   let done = false;
   const run = async () => {
     if (done) return;
@@ -44,7 +48,8 @@ export class ClipboardGuard {
 
   registerCopied(text: string, seconds: number | null): void {
     this.pending?.cancel();
-    this.pending = seconds === null ? null : scheduleClipboardClear(text, seconds, this.fx);
+    this.pending =
+      seconds === null ? null : scheduleClipboardClear(text, seconds, this.fx);
   }
 
   // Lock Vault: immediately clear the clipboard if it still holds the last

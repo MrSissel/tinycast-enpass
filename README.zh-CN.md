@@ -108,6 +108,7 @@ npm run build       # ray build -e dist -o dist → dist/
 - **剪贴板倒计时清除只在命令会话存活期间有效**：复制密码后若立即离开命令，JSContext 被销毁，30 秒定时器随之消失，剪贴板将不会被自动清除（内容本身带 concealed 标记，仍不进 Tinycast 剪贴板历史）。需要倒计时保障时请保持界面打开。
 - **粘贴动作经过系统剪贴板**（Raycast API 的 `Clipboard.paste` 如此），瞬时内容可能被剪贴板历史捕获；介意请用默认的复制动作（带 concealed 标记）。
 - **fn 修饰键依赖 Tinycast 支持**：`@raycast/api` 类型层面不认识 `fn`，扩展以类型断言传入；在原生 Raycast 中 fn↩ 无效。
+- **表单在 Tinycast ≤ 0.11.12 上不自动聚焦**：正式版二进制的 JS 层转发了 `autoFocus` 但 Swift 侧缺少消费代码（上游 main 已实现，待发布）。解锁表单已改为根屏渲染规避；其他场景按 Tab/↓ 聚焦，表单内 ⌘↩ 提交。
 - **spawn 的 stdin 是一次性的**（Tinycast 运行时限制）：本扩展不走 stdin，主密码经环境变量传入，不受影响。
 - TOTP 使用标准 30 秒周期、6 位码（enpass-cli 同样如此）。
 - 回收站条目与正常条目同样展示（开启 Trash 时），UI 不做额外区分。

@@ -3,8 +3,6 @@
   "name": "enpass",
   "title": "Enpass",
   "icon": "icon.png",
-  "description": "Search your Enpass vault and copy passwords, usernames and one-time codes without opening Enpass.",
-  "author": "MrSissel",
   "license": "MIT",
   "keywords": [
     "enpass",
@@ -183,18 +181,19 @@
       "required": false,
       "default": false,
       "label": "Include trashed items",
-      "title": "Trash",
       "description": "Also show entries in the Enpass trash (enpass-cli -trashed)."
     }
   ],
   "scripts": {
-    "build": "ray build -e dist -o dist",
+    "build": "ray build -e dist -o dist -I --exit-on-error",
     "dev": "ray develop",
+    "lint": "eslint src test && prettier --check src test",
+    "format": "prettier --write src test",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "dependencies": {
     "@raycast/api": "^2.6.2",
@@ -202,9 +201,12 @@
     "react": "^19.0.0"
   },
   "devDependencies": {
+    "@raycast/eslint-config": "^2.2.0",
     "@types/node": "^22.19.17",
     "@types/react": "^19.0.10",
-    "typescript": "^7.0.2",
+    "eslint": "^10.12.0",
+    "prettier": "^3.9.9",
+    "typescript": "^5.9.3",
     "vitest": "^5.0.3"
   }
 }

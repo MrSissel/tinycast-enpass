@@ -19,14 +19,18 @@ export const MASK = "••••••••";
 
 // Labels that mark secrets even when enpass-cli does not set `sensitive`.
 // Over-masking is the safe direction: worst case a harmless field is hidden.
-const SENSITIVE_RE = /pass|secret|totp|pin|cvv|cvc|card\s*(no|num|number)|recovery|security\s*code/i;
+const SENSITIVE_RE =
+  /pass|secret|totp|pin|cvv|cvc|card\s*(no|num|number)|recovery|security\s*code/i;
 
 export function isSensitiveField(field: VaultField): boolean {
   if (field.sensitive === true) return true;
   return SENSITIVE_RE.test(`${field.type} ${field.label ?? ""}`);
 }
 
-export function firstField(item: VaultItem, pred: (f: VaultField) => boolean): VaultField | undefined {
+export function firstField(
+  item: VaultItem,
+  pred: (f: VaultField) => boolean,
+): VaultField | undefined {
   return item.fields.find((f) => f.value && pred(f));
 }
 
@@ -35,7 +39,11 @@ export function passwordOf(item: VaultItem): string | undefined {
 }
 
 export function usernameOf(item: VaultItem): string | undefined {
-  return firstField(item, (f) => f.type === "username")?.value ?? item.subtitle ?? undefined;
+  return (
+    firstField(item, (f) => f.type === "username")?.value ??
+    item.subtitle ??
+    undefined
+  );
 }
 
 const URL_LABEL_RE = /^(url|web\s?site|homepage)$/i;
@@ -43,7 +51,10 @@ const URL_LABEL_RE = /^(url|web\s?site|homepage)$/i;
 export function urlOf(item: VaultItem): string | undefined {
   return firstField(
     item,
-    (f) => f.type === "url" || f.type === "website" || URL_LABEL_RE.test(f.label ?? ""),
+    (f) =>
+      f.type === "url" ||
+      f.type === "website" ||
+      URL_LABEL_RE.test(f.label ?? ""),
   )?.value;
 }
 
@@ -56,7 +67,9 @@ export function safeHttpUrl(raw: string | undefined): string | null {
   if (!raw) return null;
   try {
     const u = new URL(raw.trim());
-    return u.protocol === "http:" || u.protocol === "https:" ? u.toString() : null;
+    return u.protocol === "http:" || u.protocol === "https:"
+      ? u.toString()
+      : null;
   } catch {
     return null;
   }

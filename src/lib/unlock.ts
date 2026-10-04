@@ -1,7 +1,11 @@
 import { existsSync } from "node:fs";
 import { clipboardGuard } from "./actions";
 import { checkCli, getSnapshot } from "./enpass";
-import { deleteKeychainPassword, readKeychainPassword, writeKeychainPassword } from "./keychain";
+import {
+  deleteKeychainPassword,
+  readKeychainPassword,
+  writeKeychainPassword,
+} from "./keychain";
 import { autoLockMode, prefs, resolveCliPath, resolveVaultPath } from "./prefs";
 import { setSnapshot } from "./session";
 
@@ -22,12 +26,16 @@ export async function unlock(masterPassword?: string): Promise<number> {
 
   const cliPath = resolveCliPath(p);
   if (!cliPath) {
-    throw new Error("enpass-cli not found. Install it first: brew install enpass-cli");
+    throw new Error(
+      "enpass-cli not found. Install it first: brew install enpass-cli",
+    );
   }
   try {
     await checkCli(cliPath);
   } catch (e) {
-    throw new Error(`enpass-cli at ${cliPath} failed to run: ${e instanceof Error ? e.message : String(e)}`);
+    throw new Error(
+      `enpass-cli at ${cliPath} failed to run: ${e instanceof Error ? e.message : String(e)}`,
+    );
   }
 
   const vaultPath = resolveVaultPath(p);
@@ -55,17 +63,25 @@ export async function unlock(masterPassword?: string): Promise<number> {
       includeTrashed: p.includeTrashed ?? false,
       masterPassword: password,
     });
-    if (p.unlockMethod === "masterpw-keychain" && masterPassword !== undefined) {
+    if (
+      p.unlockMethod === "masterpw-keychain" &&
+      masterPassword !== undefined
+    ) {
       // Persist only AFTER a successful unlock proves the password right.
       // Best-effort: a failed write just means the form appears again next time.
-      await writeKeychainPassword(vaultPath, masterPassword).catch(() => undefined);
+      await writeKeychainPassword(vaultPath, masterPassword).catch(
+        () => undefined,
+      );
     }
     setSnapshot(items, autoLockMode(p), () => clipboardGuard.lock());
     return items.length;
   } catch (e) {
     // A stored password that no longer opens the vault was changed in Enpass:
     // drop the stale item and ask again, instead of failing forever.
-    if (usedSaved && /open vault|decrypt/i.test(e instanceof Error ? e.message : String(e))) {
+    if (
+      usedSaved &&
+      /open vault|decrypt/i.test(e instanceof Error ? e.message : String(e))
+    ) {
       await deleteKeychainPassword(vaultPath);
       throw new PasswordRequiredError();
     }

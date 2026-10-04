@@ -1,1 +1,28 @@
-[{"uuid":"489e13cc-3dea-40a9-b883-2bd61f2f4f48","title":"Whatever","subtitle":"johndoe@whatever.com","category":"login","fields":[{"type":"username","value":"johndoe@whatever.com"},{"type":"email","value":"johndoe@whatever"},{"type":"password","sensitive":true,"value":"noIdeaata11"},{"type":"section","label":"INCOMING"},{"type":"text","label":"URL","value":"https://www.whatever.com"},{"type":"text","label":"User name","value":"johndoe@whatever.com"},{"type":"text","label":"Port No.","value":"110"},{"type":"text","label":"Authentification","value":"Password"},{"type":"section","label":"OUTGOING"},{"type":"text","label":"SMTP-Server","value":"smtp.whatever.com"},{"type":"text","label":"User name","value":"johndoe@whatever.com"},{"type":"password","label":"Password","sensitive":true,"value":"noIdeaata11"},{"type":"text","label":"Authentification","value":"STARTTLS"}]}]
+[
+  {
+    "uuid": "489e13cc-3dea-40a9-b883-2bd61f2f4f48",
+    "title": "Whatever",
+    "subtitle": "johndoe@whatever.com",
+    "category": "login",
+    "fields": [
+      { "type": "username", "value": "johndoe@whatever.com" },
+      { "type": "email", "value": "johndoe@whatever" },
+      { "type": "password", "sensitive": true, "value": "noIdeaata11" },
+      { "type": "section", "label": "INCOMING" },
+      { "type": "text", "label": "URL", "value": "https://www.whatever.com" },
+      { "type": "text", "label": "User name", "value": "johndoe@whatever.com" },
+      { "type": "text", "label": "Port No.", "value": "110" },
+      { "type": "text", "label": "Authentification", "value": "Password" },
+      { "type": "section", "label": "OUTGOING" },
+      { "type": "text", "label": "SMTP-Server", "value": "smtp.whatever.com" },
+      { "type": "text", "label": "User name", "value": "johndoe@whatever.com" },
+      {
+        "type": "password",
+        "label": "Password",
+        "sensitive": true,
+        "value": "noIdeaata11"
+      },
+      { "type": "text", "label": "Authentification", "value": "STARTTLS" }
+    ]
+  }
+]

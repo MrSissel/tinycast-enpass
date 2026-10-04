@@ -33,7 +33,11 @@ export function isUnlocked(): boolean {
   return snapshot !== null;
 }
 
-export function setSnapshot(items: VaultItem[], lockMode: AutoLock, onLockHook?: () => Promise<void>): void {
+export function setSnapshot(
+  items: VaultItem[],
+  lockMode: AutoLock,
+  onLockHook?: () => Promise<void>,
+): void {
   clearTimer();
   snapshot = items;
   autoLock = lockMode;

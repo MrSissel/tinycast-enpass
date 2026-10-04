@@ -13,7 +13,11 @@ export const clipboardGuard = new ClipboardGuard({
 
 // Sensitive values ALWAYS go through Clipboard.copy(…, { concealed: true }) so
 // Tinycast's clipboard-history poller skips them (ConcealedType marker).
-export async function copyValue(text: string, label: string, sensitive: boolean): Promise<void> {
+export async function copyValue(
+  text: string,
+  label: string,
+  sensitive: boolean,
+): Promise<void> {
   if (sensitive) {
     await Clipboard.copy(text, { concealed: true });
     clipboardGuard.registerCopied(text, clearSeconds(prefs()));
@@ -33,7 +37,11 @@ export async function pasteValue(text: string, label: string): Promise<void> {
 export async function openWebsite(raw: string | undefined): Promise<void> {
   const url = safeHttpUrl(raw);
   if (!url) {
-    await showToast({ style: Toast.Style.Failure, title: "Not opened", message: "Only http/https URLs are allowed." });
+    await showToast({
+      style: Toast.Style.Failure,
+      title: "Not opened",
+      message: "Only http/https URLs are allowed.",
+    });
     return;
   }
   await open(url);

@@ -1,5 +1,12 @@
 import { spawn } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, rmdirSync, unlinkSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  rmdirSync,
+  unlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { VaultItem } from "./item";
@@ -15,14 +22,20 @@ import { VaultItem } from "./item";
 // are absent there (crash: "cpSync is not a function"). Copy via read/write,
 // remove via unlink.
 const MIRROR_DIR = join(tmpdir(), "raycast-enpass-vault");
-const VAULT_FILES = ["vault.enpassdb", "vault.json", "vault.enpassdb-wal", "vault.enpassdb-shm"];
+const VAULT_FILES = [
+  "vault.enpassdb",
+  "vault.json",
+  "vault.enpassdb-wal",
+  "vault.enpassdb-shm",
+];
 
 export function mirrorVault(realVault: string): string {
   mkdirSync(MIRROR_DIR, { recursive: true });
   wipeMirrorFiles();
   for (const name of VAULT_FILES) {
     const src = join(realVault, name);
-    if (existsSync(src)) writeFileSync(join(MIRROR_DIR, name), readFileSync(src));
+    if (existsSync(src))
+      writeFileSync(join(MIRROR_DIR, name), readFileSync(src));
   }
   return MIRROR_DIR;
 }
@@ -74,7 +87,11 @@ export interface CliResult {
   code: number;
 }
 
-export function runCli(cliPath: string, args: string[], masterPassword?: string): Promise<CliResult> {
+export function runCli(
+  cliPath: string,
+  args: string[],
+  masterPassword?: string,
+): Promise<CliResult> {
   const { promise, resolve, reject } = Promise.withResolvers<CliResult>();
   const env = { ...process.env };
   if (masterPassword !== undefined) env.MASTERPW = masterPassword;
@@ -97,10 +114,14 @@ export function cliErrorMessage(stderr: string): string {
 
 export function parseSnapshot(stdout: string): VaultItem[] {
   const data: unknown = JSON.parse(stdout);
-  if (!Array.isArray(data)) throw new Error("unexpected enpass-cli output: not a JSON array");
+  if (!Array.isArray(data))
+    throw new Error("unexpected enpass-cli output: not a JSON array");
   return data.filter(
     (e): e is VaultItem =>
-      typeof e === "object" && e !== null && typeof (e as VaultItem).title === "string" && Array.isArray((e as VaultItem).fields),
+      typeof e === "object" &&
+      e !== null &&
+      typeof (e as VaultItem).title === "string" &&
+      Array.isArray((e as VaultItem).fields),
   );
 }
 
@@ -109,7 +130,11 @@ export function parseSnapshot(stdout: string): VaultItem[] {
 // real vault directory; the mirror is wiped afterwards either way.
 export async function getSnapshot(o: SnapshotOptions): Promise<VaultItem[]> {
   try {
-    const result = await runCli(o.cliPath, buildSnapshotArgs({ ...o, vaultPath: mirrorVault(o.vaultPath) }), o.masterPassword);
+    const result = await runCli(
+      o.cliPath,
+      buildSnapshotArgs({ ...o, vaultPath: mirrorVault(o.vaultPath) }),
+      o.masterPassword,
+    );
     if (result.code !== 0) throw new Error(cliErrorMessage(result.stderr));
     return parseSnapshot(result.stdout);
   } finally {

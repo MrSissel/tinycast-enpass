@@ -1,7 +1,13 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { parseSnapshot } from "../src/lib/enpass";
-import { isSensitiveField, passwordOf, safeHttpUrl, urlOf, usernameOf } from "../src/lib/item";
+import {
+  isSensitiveField,
+  passwordOf,
+  safeHttpUrl,
+  urlOf,
+  usernameOf,
+} from "../src/lib/item";
 
 // Fixture: real `enpass-cli -detailed -json -sort show` output of the public
 // test vault (hazcod/enpass-cli v1.14.0, password "absolutely-No-clue").
@@ -38,13 +44,17 @@ describe("isSensitiveField", () => {
     expect(isSensitiveField({ type: "totp" })).toBe(true);
     expect(isSensitiveField({ type: "text", label: "PIN" })).toBe(true);
     expect(isSensitiveField({ type: "text", label: "Card Number" })).toBe(true);
-    expect(isSensitiveField({ type: "text", label: "Recovery Codes" })).toBe(true);
+    expect(isSensitiveField({ type: "text", label: "Recovery Codes" })).toBe(
+      true,
+    );
   });
 
   it("does not mask ordinary fields", () => {
     expect(isSensitiveField({ type: "text", label: "URL" })).toBe(false);
     expect(isSensitiveField({ type: "text", label: "Port No." })).toBe(false);
-    expect(isSensitiveField({ type: "text", label: "Authentification" })).toBe(false);
+    expect(isSensitiveField({ type: "text", label: "Authentification" })).toBe(
+      false,
+    );
   });
 });
 

@@ -1,4 +1,13 @@
-import { Action, ActionPanel, Icon, Keyboard, List, showHUD, showToast, Toast } from "@raycast/api";
+import {
+  Action,
+  ActionPanel,
+  Icon,
+  Keyboard,
+  List,
+  showHUD,
+  showToast,
+  Toast,
+} from "@raycast/api";
 import { useEffect, useState } from "react";
 import { copyValue, openWebsite, pasteValue } from "./actions";
 import {
@@ -24,7 +33,10 @@ import { LockedList } from "./unlock-view";
 // Refresh Vault render this; Refresh just auto-starts the unlock prompt.
 
 // ponytail: fn is a Tinycast-supported modifier; @raycast/api types only know cmd/ctrl/opt/shift.
-const FN_RETURN: Keyboard.Shortcut = { modifiers: ["fn" as Keyboard.KeyModifier], key: "return" };
+const FN_RETURN: Keyboard.Shortcut = {
+  modifiers: ["fn" as Keyboard.KeyModifier],
+  key: "return",
+};
 
 const ICON_BY_CATEGORY: Record<string, Icon> = {
   login: Icon.Key,
@@ -36,7 +48,10 @@ const ICON_BY_CATEGORY: Record<string, Icon> = {
   password: Icon.Lock,
 };
 
-export function VaultCommand(props: { autoStart: boolean; hudVerb: "unlocked" | "refreshed" }) {
+export function VaultCommand(props: {
+  autoStart: boolean;
+  hudVerb: "unlocked" | "refreshed";
+}) {
   const [snapshot, setSnapshot] = useState(getSnapshot());
   const [isRefreshing, setIsRefreshing] = useState(false);
   useEffect(() => subscribe(() => setSnapshot(getSnapshot())), []);
@@ -55,13 +70,23 @@ export function VaultCommand(props: { autoStart: boolean; hudVerb: "unlocked" | 
   return (
     <List searchBarPlaceholder="Search Enpass vault…">
       {snapshot.map((item) => (
-        <VaultListItem key={item.uuid} item={item} onRefresh={() => setIsRefreshing(true)} />
+        <VaultListItem
+          key={item.uuid}
+          item={item}
+          onRefresh={() => setIsRefreshing(true)}
+        />
       ))}
     </List>
   );
 }
 
-function VaultListItem({ item, onRefresh }: { item: VaultItem; onRefresh: () => void }) {
+function VaultListItem({
+  item,
+  onRefresh,
+}: {
+  item: VaultItem;
+  onRefresh: () => void;
+}) {
   const password = passwordOf(item);
   const username = usernameOf(item);
   const totpSecret = totpSecretOf(item);
@@ -77,7 +102,10 @@ function VaultListItem({ item, onRefresh }: { item: VaultItem; onRefresh: () => 
     if (!totpSecret) return;
     const code = totpCode(totpSecret);
     if (code === null) {
-      await showToast({ style: Toast.Style.Failure, title: "Invalid TOTP secret on this entry" });
+      await showToast({
+        style: Toast.Style.Failure,
+        title: "Invalid TOTP secret on this entry",
+      });
       return;
     }
     await copyValue(code, "One-time code", true);
@@ -92,16 +120,36 @@ function VaultListItem({ item, onRefresh }: { item: VaultItem; onRefresh: () => 
       keywords={searchKeywords(item)}
       actions={
         <ActionPanel>
-          {password && (primary === "copy" ? (
-            <Action title="Copy Password" icon={Icon.Clipboard} onAction={copyPassword} />
-          ) : (
-            <Action title="Paste Password" icon={Icon.Clipboard} onAction={pastePassword} />
-          ))}
-          {password && (primary === "copy" ? (
-            <Action title="Paste Password" icon={Icon.Clipboard} shortcut={FN_RETURN} onAction={pastePassword} />
-          ) : (
-            <Action title="Copy Password" icon={Icon.Clipboard} shortcut={FN_RETURN} onAction={copyPassword} />
-          ))}
+          {password &&
+            (primary === "copy" ? (
+              <Action
+                title="Copy Password"
+                icon={Icon.Clipboard}
+                onAction={copyPassword}
+              />
+            ) : (
+              <Action
+                title="Paste Password"
+                icon={Icon.Clipboard}
+                onAction={pastePassword}
+              />
+            ))}
+          {password &&
+            (primary === "copy" ? (
+              <Action
+                title="Paste Password"
+                icon={Icon.Clipboard}
+                shortcut={FN_RETURN}
+                onAction={pastePassword}
+              />
+            ) : (
+              <Action
+                title="Copy Password"
+                icon={Icon.Clipboard}
+                shortcut={FN_RETURN}
+                onAction={copyPassword}
+              />
+            ))}
           {username && (
             <Action
               title="Copy Username"
@@ -111,7 +159,12 @@ function VaultListItem({ item, onRefresh }: { item: VaultItem; onRefresh: () => 
             />
           )}
           {totpSecret && (
-            <Action title="Copy One-Time Code" icon={Icon.Clock} shortcut={{ modifiers: ["opt"], key: "return" }} onAction={copyTotp} />
+            <Action
+              title="Copy One-Time Code"
+              icon={Icon.Clock}
+              shortcut={{ modifiers: ["opt"], key: "return" }}
+              onAction={copyTotp}
+            />
           )}
           {safeHttpUrl(url) && (
             <Action
@@ -131,7 +184,7 @@ function VaultListItem({ item, onRefresh }: { item: VaultItem; onRefresh: () => 
             <Action
               title="Refresh Vault"
               icon={Icon.ArrowClockwise}
-              shortcut={{ modifiers: ["cmd"], key: "r" }}
+              shortcut={Keyboard.Shortcut.Common.Refresh}
               onAction={onRefresh}
             />
             <Action
@@ -165,7 +218,13 @@ function FieldsList({ item }: { item: VaultItem }) {
             accessories={liveCode ? [{ text: `Code: ${liveCode}` }] : []}
             actions={
               <ActionPanel>
-                <Action title="Copy Field" icon={Icon.Clipboard} onAction={() => copyValue(value, f.label ?? "Field", sensitive)} />
+                <Action
+                  title="Copy Field"
+                  icon={Icon.Clipboard}
+                  onAction={() =>
+                    copyValue(value, f.label ?? "Field", sensitive)
+                  }
+                />
                 <Action
                   title="Paste Field"
                   icon={Icon.Clipboard}

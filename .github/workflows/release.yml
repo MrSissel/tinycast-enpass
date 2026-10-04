@@ -1,0 +1,35 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: brew install enpass-cli
+
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+
+      # Tinycast imports this exact layout via Settings → Extensions → Add from folder.
+      - name: Zip the installable bundle
+        working-directory: dist
+        run: zip -r "$GITHUB_WORKSPACE/enpass-tinycast.zip" .
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: enpass-tinycast.zip
+          generate_release_notes: true

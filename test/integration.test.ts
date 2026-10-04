@@ -1,13 +1,29 @@
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { buildSnapshotArgs, checkCli, getSnapshot, mirrorVault, runCli } from "../src/lib/enpass";
+import {
+  buildSnapshotArgs,
+  checkCli,
+  getSnapshot,
+  mirrorVault,
+  runCli,
+} from "../src/lib/enpass";
 import { passwordOf, totpSecretOf } from "../src/lib/item";
 
 // End-to-end against the PUBLIC test vault from hazcod/enpass-cli v1.14.0
 // (password "absolutely-No-clue"). Never touches a real vault.
-const CLI = ["/opt/homebrew/bin/enpass-cli", "/usr/local/bin/enpass-cli"].find(existsSync);
+const CLI = ["/opt/homebrew/bin/enpass-cli", "/usr/local/bin/enpass-cli"].find(
+  existsSync,
+);
 const VAULT = `${__dirname}/fixtures/testvault`;
 const MASTERPW = "absolutely-No-clue";
 
@@ -25,7 +41,11 @@ describe("mirrorVault", () => {
     writeFileSync(`${src}/intruder.txt`, "nope");
     const out = mirrorVault(src);
     expect(out).toBe(mirror); // stable path: enpass-cli's keychain account derives from it
-    expect(readdirSync(out).sort()).toEqual(["vault.enpassdb", "vault.enpassdb-wal", "vault.json"]);
+    expect(readdirSync(out).sort()).toEqual([
+      "vault.enpassdb",
+      "vault.enpassdb-wal",
+      "vault.json",
+    ]);
     rmSync(src, { recursive: true, force: true });
   });
 
@@ -54,7 +74,16 @@ describe("buildSnapshotArgs", () => {
     const showAt = args.indexOf("show");
     expect(showAt).toBeGreaterThan(0);
     expect(args.slice(0, showAt).every((a) => a.startsWith("-"))).toBe(true);
-    expect(args).toEqual(["-vault=/v", "-keyfile=/k", "-biometric", "-trashed", "-detailed", "-json", "-sort", "show"]);
+    expect(args).toEqual([
+      "-vault=/v",
+      "-keyfile=/k",
+      "-biometric",
+      "-trashed",
+      "-detailed",
+      "-json",
+      "-sort",
+      "show",
+    ]);
   });
 });
 
@@ -76,25 +105,50 @@ describe("enpass-cli against the test vault", () => {
     expect(totpSecretOf(items[0])).toBeUndefined();
   });
 
-  itWithCli("leaves no SQLite artifacts in the real vault directory", async () => {
-    await getSnapshot({ cliPath: CLI!, vaultPath: VAULT, biometric: false, includeTrashed: false, masterPassword: MASTERPW });
-    expect(readdirSync(VAULT).sort()).toEqual(["vault.enpassdb", "vault.json"]);
-    expect(existsSync(join(tmpdir(), "raycast-enpass-vault"))).toBe(false); // mirror wiped
-  });
+  itWithCli(
+    "leaves no SQLite artifacts in the real vault directory",
+    async () => {
+      await getSnapshot({
+        cliPath: CLI!,
+        vaultPath: VAULT,
+        biometric: false,
+        includeTrashed: false,
+        masterPassword: MASTERPW,
+      });
+      expect(readdirSync(VAULT).sort()).toEqual([
+        "vault.enpassdb",
+        "vault.json",
+      ]);
+      expect(existsSync(join(tmpdir(), "raycast-enpass-vault"))).toBe(false); // mirror wiped
+    },
+  );
 
   itWithCli("fails cleanly with a wrong master password", async () => {
     await expect(
-      getSnapshot({ cliPath: CLI!, vaultPath: VAULT, biometric: false, includeTrashed: false, masterPassword: "wrong" }),
+      getSnapshot({
+        cliPath: CLI!,
+        vaultPath: VAULT,
+        biometric: false,
+        includeTrashed: false,
+        masterPassword: "wrong",
+      }),
     ).rejects.toThrow();
   });
 
-  itWithCli("documents the flags-after-subcommand trap: -detailed after show is silently swallowed", async () => {
-    // This is the bug the arg builder prevents: Go's flag package stops at "show",
-    // so "-detailed" becomes a search FILTER and matches nothing.
-    const mirror = mirrorVault(VAULT);
-    const result = await runCli(CLI!, [`-vault=${mirror}`, "-json", "show", "-detailed"], MASTERPW);
-    rmSync(mirror, { recursive: true, force: true });
-    expect(result.code).toBe(0);
-    expect(JSON.parse(result.stdout)).toEqual([]);
-  });
+  itWithCli(
+    "documents the flags-after-subcommand trap: -detailed after show is silently swallowed",
+    async () => {
+      // This is the bug the arg builder prevents: Go's flag package stops at "show",
+      // so "-detailed" becomes a search FILTER and matches nothing.
+      const mirror = mirrorVault(VAULT);
+      const result = await runCli(
+        CLI!,
+        [`-vault=${mirror}`, "-json", "show", "-detailed"],
+        MASTERPW,
+      );
+      rmSync(mirror, { recursive: true, force: true });
+      expect(result.code).toBe(0);
+      expect(JSON.parse(result.stdout)).toEqual([]);
+    },
+  );
 });

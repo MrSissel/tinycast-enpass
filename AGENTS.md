@@ -8,10 +8,21 @@ operation** (no create/edit/trash/delete, no vault mutation of any kind).
 
 ```sh
 npm install
+npm run lint        # eslint + prettier --check (must stay clean)
 npm run test        # vitest, must stay green (incl. live CLI integration tests)
 npm run typecheck   # tsc --noEmit
 npm run build       # ray build -e dist -o dist → dist/ is what Tinycast imports
 ```
+
+CI runs the same four gates on macos-14 (`.github/workflows/ci.yml`); tags
+`v*` cut a GitHub Release with the zipped `dist/` (`.github/workflows/release.yml`).
+
+Lint is `eslint` + `prettier` directly, NOT `ray lint`: this is a private
+extension, and `ray lint`'s manifest validation hard-requires a raycast.com
+author account (its `--relaxed` flag does not exempt it). If the extension is
+ever submitted to the Raycast Store, restore an `author` field with a real
+raycast.com username and switch CI to `ray lint`. TypeScript must stay on 5.x
+— typescript-eslint (inside @raycast/eslint-config) hard-throws on TS 7.
 
 Tinycast installs the extension via Settings → Extensions → Add from folder →
 **`dist/`** (not the repo root). Folder installs never auto-update: rebuild and
@@ -44,16 +55,18 @@ survive reinstalls — a changed default does not reach existing installs.
 - **Every sensitive copy goes through `copyValue(…, sensitive=true)`**
   (`src/lib/actions.ts`) → `Clipboard.copy(…, { concealed: true })`. Never add
   a raw `Clipboard.copy` for a secret. Usernames are non-sensitive on purpose.
-- **Only http/https may be opened**, via `safeHttpUrl` in `src/lib/item.ts`.
+- **Tinycast form quirks**: v0.11.12 (release binary) has no form auto-focus at
+  all — the JS runtime forwards `autoFocus` but the release's Swift side lacks
+  the consumption code (verified: Mach-O has no autofocus symbols while
+  sibling property names are present; implemented on upstream main, pending
+  release) — render unlock forms as root screens anyway, and Tab/↓ to focus;
+  ↩ submits from non-text controls, ⌘↩ from text fields; `List.EmptyView`
+  actions never fire — use real `List.Item`s for primary actions; `fn`
+  modifier is Tinycast-only (type assertion in `vault-command.tsx`).
 - **Tests touch ONLY `test/fixtures/testvault`** (public hazcod/enpass-cli test
   vault, password `absolutely-No-clue`, passed via MASTERPW env). Never point a
   test or a dev script at `~/Library/Containers/in.sinew.Enpass-Desktop/…` or
   any real vault — not even reads.
-- **Tinycast form quirks**: pushed forms don't auto-focus (0.11.12) — render
-  unlock forms as root screens; ↩ submits from non-text controls, ⌘↩ from text
-  fields; `List.EmptyView` actions never fire — use real `List.Item`s for
-  primary actions; `fn` modifier is Tinycast-only (type assertion in
-  `vault-command.tsx`).
 - **Error toasts must stay short** — Tinycast grows the palette to fit long
   toast text. Map known enpass-cli errors in `unlockErrorText`
   (`src/lib/unlock-view.tsx`).

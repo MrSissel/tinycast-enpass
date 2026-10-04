@@ -22,12 +22,16 @@ export function prefs(): Preferences {
 }
 
 export function expandHome(path: string): string {
-  return path.startsWith("~/") || path === "~" ? path.replace(/^~/, homedir()) : path;
+  return path.startsWith("~/") || path === "~"
+    ? path.replace(/^~/, homedir())
+    : path;
 }
 
 function whichEnpassCli(): string | null {
   try {
-    const found = execFileSync("/usr/bin/which", ["enpass-cli"], { encoding: "utf8" }).trim();
+    const found = execFileSync("/usr/bin/which", ["enpass-cli"], {
+      encoding: "utf8",
+    }).trim();
     return found.length > 0 ? found : null;
   } catch {
     return null;
@@ -36,7 +40,8 @@ function whichEnpassCli(): string | null {
 
 // Configured path first; when missing, fall back to the standard locations.
 export function resolveCliPath(p: Preferences): string | null {
-  if (p.cliPath && existsSync(expandHome(p.cliPath))) return expandHome(p.cliPath);
+  if (p.cliPath && existsSync(expandHome(p.cliPath)))
+    return expandHome(p.cliPath);
   return detectCliPath({ exists: existsSync }, whichEnpassCli);
 }
 
@@ -62,10 +67,13 @@ export function resolveVaultPath(p: Preferences): string | null {
 }
 
 export function clearSeconds(p: Preferences): number | null {
-  return p.clearClipboardSeconds === "never" ? null : Number(p.clearClipboardSeconds);
+  return p.clearClipboardSeconds === "never"
+    ? null
+    : Number(p.clearClipboardSeconds);
 }
 
 export function autoLockMode(p: Preferences): AutoLock {
-  if (p.autoLock === "never" || p.autoLock === "afterEachUse") return p.autoLock;
+  if (p.autoLock === "never" || p.autoLock === "afterEachUse")
+    return p.autoLock;
   return Number(p.autoLock);
 }

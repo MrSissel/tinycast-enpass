@@ -108,7 +108,7 @@ Tests only ever touch the public test vault shipped with enpass-cli (`test/fixtu
 - **The clipboard countdown only runs while the command session lives**: copy a password and leave immediately, and the JSContext dies with the timer — the clipboard won't be auto-cleared (the value still carries the concealed marker, so Tinycast history skips it regardless). Keep the palette open when the countdown matters.
 - **Paste goes through the system clipboard** (Raycast API's `Clipboard.paste` works that way); the transient content may be captured by clipboard managers. Use the default copy action (concealed) if that bothers you.
 - **The fn modifier depends on Tinycast support**: `@raycast/api` types don't know `fn`, so it's passed via a type assertion; on stock Raycast fn↩ does nothing.
-- **Forms don't auto-focus when pushed** (Tinycast 0.11.12): the unlock form is therefore rendered as a root screen in the modes where it matters; elsewhere press Tab/↓ once. ↩ submits from non-text controls, ⌘↩ from text fields — platform behavior, verified in Tinycast's source.
+- **Forms don't auto-focus on Tinycast ≤ 0.11.12**: the release binary forwards `autoFocus` in its JS runtime but its Swift side has no consumption code (implemented on upstream main, pending release). The unlock form is therefore rendered as a root screen in the modes where it matters; elsewhere press Tab/↓ once. ↩ submits from non-text controls, ⌘↩ from text fields — platform behavior, verified in Tinycast's source.
 - TOTP uses the standard 30-second period and 6 digits (as does enpass-cli).
 - Trashed items (when Trash is enabled) render like any other entry.
 

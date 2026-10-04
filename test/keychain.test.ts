@@ -1,6 +1,10 @@
 import { existsSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { deleteKeychainPassword, readKeychainPassword, writeKeychainPassword } from "../src/lib/keychain";
+import {
+  deleteKeychainPassword,
+  readKeychainPassword,
+  writeKeychainPassword,
+} from "../src/lib/keychain";
 
 // Roundtrip against the real login Keychain via /usr/bin/security, with a
 // throwaway account. No prompts: items created by the security tool carry no

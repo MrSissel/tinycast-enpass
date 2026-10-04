@@ -11,11 +11,15 @@ describe("totpCode", () => {
   });
 
   it("accepts otpauth:// URIs", () => {
-    expect(totpCode(`otpauth://totp/Example?secret=${BASE32}`, 59_000)).toBe("287082");
+    expect(totpCode(`otpauth://totp/Example?secret=${BASE32}`, 59_000)).toBe(
+      "287082",
+    );
   });
 
   it("tolerates lowercase, spaces and dashes in bare secrets", () => {
-    expect(totpCode("gezd gnbv-gy3t qojq-gezd gnbv-gy3t qojq", 59_000)).toBe("287082");
+    expect(totpCode("gezd gnbv-gy3t qojq-gezd gnbv-gy3t qojq", 59_000)).toBe(
+      "287082",
+    );
   });
 
   it("returns null for garbage instead of throwing", () => {

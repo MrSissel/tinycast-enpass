@@ -6,10 +6,16 @@ export interface DetectFs {
   listDirs(path: string): string[]; // absolute paths of immediate subdirectories; [] when missing/unreadable
 }
 
-export const CLI_CANDIDATES = ["/opt/homebrew/bin/enpass-cli", "/usr/local/bin/enpass-cli"];
+export const CLI_CANDIDATES = [
+  "/opt/homebrew/bin/enpass-cli",
+  "/usr/local/bin/enpass-cli",
+];
 
 // First match wins: fixed Homebrew locations, then PATH lookup via `which` (injected).
-export function detectCliPath(fs: Pick<DetectFs, "exists">, which: () => string | null): string | null {
+export function detectCliPath(
+  fs: Pick<DetectFs, "exists">,
+  which: () => string | null,
+): string | null {
   for (const p of CLI_CANDIDATES) {
     if (fs.exists(p)) return p;
   }
@@ -28,7 +34,9 @@ export function detectVaultPaths(fs: DetectFs, home: string): string[] {
     if (hasVaultDb(fs, dir) && !hits.includes(dir)) hits.push(dir);
   };
 
-  push(`${home}/Library/Containers/in.sinew.Enpass-Desktop/Data/Documents/Vaults/primary`);
+  push(
+    `${home}/Library/Containers/in.sinew.Enpass-Desktop/Data/Documents/Vaults/primary`,
+  );
   push(`${home}/Documents/Enpass/Vaults/primary`);
 
   // Bounded walk of ~/Documents/Enpass: <root>/<anything>/Vaults/<name> and <root>/Vaults/<name>.
