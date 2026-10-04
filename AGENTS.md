@@ -38,12 +38,15 @@ Tags are the only version source (the manifest carries no version field).
 
 1. Land changes on `main`; gates must be green (`npm run lint && npm test &&
    npm run build` locally, or the CI run on main).
-2. Tag and push the tag — the tag's shape picks the channel:
-   - **Beta**: `git tag v0.2.0-beta.1 && git push origin v0.2.0-beta.1` →
-     Release marked **prerelease** on GitHub; "Latest" untouched. Increment
-     the suffix (`-beta.1`, `-beta.2`, …) until cutting stable.
-   - **Stable**: `git tag v0.2.0 && git push origin v0.2.0` → full release,
-     becomes "Latest". Patch for fixes, minor for features.
+2. Tag and push the tag — the tag's shape picks the channel. Use the helper,
+   which computes the next number from existing tags and pushes:
+   - **Beta**: `npm run release:beta` — increments the `-beta.N` suffix on a
+     beta line, or opens `vX.(Y+1).0-beta.1` after a stable tag. Release
+     marked **prerelease** on GitHub; "Latest" untouched.
+   - **Stable**: `npm run release:stable` — cuts the base version off a beta
+     line, or bumps minor from a stable tag. Full release, becomes "Latest".
+   Manual `git tag vX.Y.Z[-beta.N] && git push origin <tag>` works the same;
+   the helpers just do the numbering (`scripts/release.mjs`).
 3. Verify: `gh run watch`, then `gh release view v<tag>` — the asset
    `enpass-tinycast.zip` must be attached.
 4. Install/update in Tinycast from the release zip (or a local

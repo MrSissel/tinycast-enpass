@@ -187,8 +187,10 @@
   "scripts": {
     "build": "ray build -e dist -o dist -I --exit-on-error",
     "dev": "ray develop",
-    "lint": "eslint src test && prettier --check src test",
-    "format": "prettier --write src test",
+    "lint": "eslint src test scripts && prettier --check src test scripts",
+    "format": "prettier --write src test scripts",
+    "release:beta": "node scripts/release.mjs beta",
+    "release:stable": "node scripts/release.mjs stable",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
