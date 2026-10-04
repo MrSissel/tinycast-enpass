@@ -15,7 +15,9 @@ npm run build       # ray build -e dist -o dist → dist/ is what Tinycast impor
 ```
 
 CI runs the same four gates on macos-14 (`.github/workflows/ci.yml`); tags
-`v*` cut a GitHub Release with the zipped `dist/` (`.github/workflows/release.yml`).
+`v*` cut a GitHub Release with the zipped `dist/` (`.github/workflows/release.yml`)
+— a semver prerelease suffix in the tag (`v0.2.0-beta.1`) marks it prerelease,
+plain `v0.2.0` ships stable.
 
 Lint is `eslint` + `prettier` directly, NOT `ray lint`: this is a private
 extension, and `ray lint`'s manifest validation hard-requires a raycast.com
@@ -29,6 +31,27 @@ Tinycast installs the extension via Settings → Extensions → Add from folder 
 re-add to ship a change. Store preferences in
 `~/Library/Application Support/com.tinycast.app/extension-data/enpass.json`
 survive reinstalls — a changed default does not reach existing installs.
+
+## Releasing
+
+Tags are the only version source (the manifest carries no version field).
+
+1. Land changes on `main`; gates must be green (`npm run lint && npm test &&
+   npm run build` locally, or the CI run on main).
+2. Tag and push the tag — the tag's shape picks the channel:
+   - **Beta**: `git tag v0.2.0-beta.1 && git push origin v0.2.0-beta.1` →
+     Release marked **prerelease** on GitHub; "Latest" untouched. Increment
+     the suffix (`-beta.1`, `-beta.2`, …) until cutting stable.
+   - **Stable**: `git tag v0.2.0 && git push origin v0.2.0` → full release,
+     becomes "Latest". Patch for fixes, minor for features.
+3. Verify: `gh run watch`, then `gh release view v<tag>` — the asset
+   `enpass-tinycast.zip` must be attached.
+4. Install/update in Tinycast from the release zip (or a local
+   `npm run build`) → Settings → Extensions → Add from folder.
+
+Retract a bad tag before its release exists:
+`git tag -d v<X> && git push origin :refs/tags/v<X>`; if the release already
+published, `gh release delete v<X>` first.
 
 ## Hard constraints (all learned the hard way — do not regress)
 
