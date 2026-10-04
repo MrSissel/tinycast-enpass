@@ -1,0 +1,210 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "enpass",
+  "title": "Enpass",
+  "icon": "icon.png",
+  "description": "Search your Enpass vault and copy passwords, usernames and one-time codes without opening Enpass.",
+  "author": "MrSissel",
+  "license": "MIT",
+  "keywords": [
+    "enpass",
+    "password",
+    "vault",
+    "totp"
+  ],
+  "commands": [
+    {
+      "name": "search-vault",
+      "title": "Search Vault",
+      "description": "Search the Enpass vault and copy passwords, usernames, TOTP codes or open websites.",
+      "mode": "view"
+    },
+    {
+      "name": "lock-vault",
+      "title": "Lock Vault",
+      "description": "Wipe the in-memory vault snapshot. The next search requires a fresh unlock.",
+      "mode": "no-view"
+    },
+    {
+      "name": "refresh-vault",
+      "title": "Refresh Vault",
+      "description": "Rebuild the snapshot from the vault file (asks for Touch ID / master password again) and open the search.",
+      "mode": "view"
+    }
+  ],
+  "preferences": [
+    {
+      "name": "cliPath",
+      "type": "textfield",
+      "required": true,
+      "default": "/opt/homebrew/bin/enpass-cli",
+      "title": "enpass-cli Path",
+      "description": "Path to the enpass-cli binary. If the configured path does not exist, the extension falls back to /usr/local/bin/enpass-cli, then PATH. Install with: brew install enpass-cli"
+    },
+    {
+      "name": "vaultPath",
+      "type": "dropdown",
+      "required": false,
+      "default": "auto",
+      "title": "Vault",
+      "description": "Which vault to use. Auto-detect searches the standard Enpass data locations.",
+      "data": [
+        {
+          "title": "Auto-detect",
+          "value": "auto"
+        },
+        {
+          "title": "App Store sandbox (~/Library/Containers/in.sinew.Enpass-Desktop/Data/Documents/Vaults/primary)",
+          "value": "~/Library/Containers/in.sinew.Enpass-Desktop/Data/Documents/Vaults/primary"
+        },
+        {
+          "title": "~/Documents/Enpass/Vaults/primary",
+          "value": "~/Documents/Enpass/Vaults/primary"
+        }
+      ]
+    },
+    {
+      "name": "customVaultPath",
+      "type": "textfield",
+      "required": false,
+      "title": "Custom Vault Path",
+      "description": "Overrides 'Vault' when set. In Enpass: Settings → Advanced → Data Location shows the vault folder."
+    },
+    {
+      "name": "keyfilePath",
+      "type": "textfield",
+      "required": false,
+      "title": "Keyfile Path",
+      "description": "Optional. Only for vaults protected with a keyfile."
+    },
+    {
+      "name": "unlockMethod",
+      "type": "dropdown",
+      "required": true,
+      "default": "masterpw-keychain",
+      "title": "Unlock Method",
+      "description": "Keychain (default): enter the master password once, it is stored in the login Keychain and unlocks silently afterwards; enp-lock forgets it. Touch ID uses enpass-cli -biometric (one prompt per unlock). MASTERPW asks every time and never persists.",
+      "data": [
+        {
+          "title": "Master Password, remembered in Keychain",
+          "value": "masterpw-keychain"
+        },
+        {
+          "title": "Touch ID (-biometric)",
+          "value": "touchid"
+        },
+        {
+          "title": "Enpass Master Password, asked every time (MASTERPW)",
+          "value": "masterpw"
+        }
+      ]
+    },
+    {
+      "name": "primaryAction",
+      "type": "dropdown",
+      "required": true,
+      "default": "copy",
+      "title": "Default ↩ Action",
+      "description": "What ↩ does with the password. fn↩ always does the opposite.",
+      "data": [
+        {
+          "title": "Copy to clipboard",
+          "value": "copy"
+        },
+        {
+          "title": "Paste into active app",
+          "value": "paste"
+        }
+      ]
+    },
+    {
+      "name": "clearClipboardSeconds",
+      "type": "dropdown",
+      "required": true,
+      "default": "30",
+      "title": "Clear Clipboard After",
+      "description": "After this delay the clipboard is cleared — unless you copied something else in the meantime.",
+      "data": [
+        {
+          "title": "10 seconds",
+          "value": "10"
+        },
+        {
+          "title": "30 seconds",
+          "value": "30"
+        },
+        {
+          "title": "60 seconds",
+          "value": "60"
+        },
+        {
+          "title": "90 seconds",
+          "value": "90"
+        },
+        {
+          "title": "Never",
+          "value": "never"
+        }
+      ]
+    },
+    {
+      "name": "autoLock",
+      "type": "dropdown",
+      "required": true,
+      "default": "30",
+      "title": "Auto-Lock Session",
+      "description": "The in-memory snapshot is wiped after this time. 'After each use' locks right after every copy/paste action.",
+      "data": [
+        {
+          "title": "Never",
+          "value": "never"
+        },
+        {
+          "title": "15 minutes",
+          "value": "15"
+        },
+        {
+          "title": "30 minutes",
+          "value": "30"
+        },
+        {
+          "title": "1 hour",
+          "value": "60"
+        },
+        {
+          "title": "After each use",
+          "value": "afterEachUse"
+        }
+      ]
+    },
+    {
+      "name": "includeTrashed",
+      "type": "checkbox",
+      "required": false,
+      "default": false,
+      "label": "Include trashed items",
+      "title": "Trash",
+      "description": "Also show entries in the Enpass trash (enpass-cli -trashed)."
+    }
+  ],
+  "scripts": {
+    "build": "ray build -e dist -o dist",
+    "dev": "ray develop",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@raycast/api": "^2.6.2",
+    "otpauth": "^9.5.2",
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.17",
+    "@types/react": "^19.0.10",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.3"
+  }
+}
