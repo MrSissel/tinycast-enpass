@@ -40,7 +40,7 @@ Passwords, PINs, card numbers, recovery codes and TOTP secrets are masked (`•�
 | Unlock Method | Keychain | Keychain (default — type once, then zero prompts) / Touch ID (`-biometric`, prompt every time) / master password every time (`MASTERPW`) |
 | Default ↩ Action | Copy | Whether ↩ copies or pastes; fn↩ always does the opposite |
 | Clear Clipboard After | 30 s | 10 / 30 / 60 / 90 s or never. Skipped when the clipboard no longer holds the secret |
-| Auto-Lock Session | 30 min | Never / 15 / 30 / 60 min / after each use. Expiry performs the equivalent of Lock |
+| Auto-Lock Session | 30 min | Never / 15 / 30 / 60 min / after each use. Expiry performs the equivalent of Lock. In Keychain unlock mode it also gates the silent unlock across launches: once the window has passed since the last unlock, the master password is asked again (alfred-enpass parity) |
 | Trash | off | Include trashed items (`enpass-cli -trashed`) |
 
 ## Unlock methods
@@ -104,7 +104,7 @@ Tests only ever touch the public test vault shipped with enpass-cli (`test/fixtu
 ## Known limitations
 
 - **Every unlock / refresh prompts once** (Touch ID scan or master password entry in non-Keychain modes) — enpass-cli has no session cache. In Keychain mode, re-unlocks are silent, so auto-lock and ⌘R become frictionless there.
-- **Sessions end with the command UI**: Tinycast destroys the JSContext when you leave a command, so leaving the search locks the vault. Stronger security, but the "auto-lock after 30 minutes" options only matter while the command stays open; reopening always requires an unlock (silent in Keychain mode).
+- **Sessions end with the command UI**: Tinycast destroys the JSContext when you leave a command, so leaving the search locks the vault. The in-session auto-lock timer only matters while the command stays open, but in Keychain mode the auto-lock window also applies across launches: a timestamp of the last unlock is kept at `$TMPDIR/raycast-enpass-unlock-stamp` (0600, no secrets), and once the window has passed, reopening asks for the master password instead of unlocking silently.
 - **The clipboard countdown only runs while the command session lives**: copy a password and leave immediately, and the JSContext dies with the timer — the clipboard won't be auto-cleared (the value still carries the concealed marker, so Tinycast history skips it regardless). Keep the palette open when the countdown matters.
 - **Paste goes through the system clipboard** (Raycast API's `Clipboard.paste` works that way); the transient content may be captured by clipboard managers. Use the default copy action (concealed) if that bothers you.
 - **The fn modifier depends on Tinycast support**: `@raycast/api` types don't know `fn`, so it's passed via a type assertion; on stock Raycast fn↩ does nothing.

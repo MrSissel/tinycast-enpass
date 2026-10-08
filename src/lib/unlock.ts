@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import { clipboardGuard } from "./actions";
 import { checkCli, getSnapshot } from "./enpass";
+import { idleLockExpired, touchUnlock } from "./idle-lock";
 import {
   deleteKeychainPassword,
   readKeychainPassword,
@@ -49,6 +50,9 @@ export async function unlock(masterPassword?: string): Promise<number> {
   let password = masterPassword;
   let usedSaved = false;
   if (p.unlockMethod === "masterpw-keychain" && password === undefined) {
+    // Auto-lock window expired since the last unlock: refuse the silent
+    // Keychain read and let the password form appear instead.
+    if (idleLockExpired(autoLockMode(p))) throw new PasswordRequiredError();
     password = (await readKeychainPassword(vaultPath)) ?? undefined;
     usedSaved = password !== undefined;
     if (!usedSaved) throw new PasswordRequiredError();
@@ -74,6 +78,7 @@ export async function unlock(masterPassword?: string): Promise<number> {
       );
     }
     setSnapshot(items, autoLockMode(p), () => clipboardGuard.lock());
+    if (p.unlockMethod === "masterpw-keychain") touchUnlock();
     return items.length;
   } catch (e) {
     // A stored password that no longer opens the vault was changed in Enpass:

@@ -40,7 +40,7 @@
 | Unlock Method | 钥匙串记忆 | 主密码记忆于钥匙串（默认，首次输入后零提示）/ Touch ID（`-biometric`，每次弹指纹）/ Enpass 主密码（`MASTERPW`，每次输入） |
 | Default ↩ Action | Copy | ↩ 是复制还是粘贴；fn↩ 恒为相反动作 |
 | Clear Clipboard After | 30 秒 | 10 / 30 / 60 / 90 秒 / 永不。到时时若剪贴板已被其他内容覆盖则不清除 |
-| Auto-Lock Session | 30 分钟 | 永不 / 15 / 30 / 60 分钟 / 每次使用后。到期执行等效 Lock 的清空 |
+| Auto-Lock Session | 30 分钟 | 永不 / 15 / 30 / 60 分钟 / 每次使用后。到期执行等效 Lock 的清空。钥匙串记忆模式下还跨启动约束静默解锁：距上次解锁超过该窗口后，需重新输入主密码（与 alfred-enpass 一致） |
 | Trash | 关 | 是否包含回收站条目（`enpass-cli -trashed`） |
 
 ## 解锁模式
@@ -104,7 +104,7 @@ npm run build       # ray build -e dist -o dist → dist/
 ## 已知限制
 
 - **每次解锁 / 刷新都弹一次 Touch ID**（enpass-cli 无会话缓存），这是设计使然：快照驻留内存换来会话内零打扰。Touch ID 弹窗的"使用密码"按钮不可用（enpass-cli 纯生物识别策略）——密码回退请用锁定界面的 ⌘↩ 主密码通道。
-- **会话随命令界面结束**：Tinycast 每次启动命令都销毁旧 JSContext，离开搜索界面即锁定。安全性更强，但意味着"自动锁定 30 分钟"等选项只在界面持续打开时起作用；关闭面板后再进入必须重新解锁。
+- **会话随命令界面结束**：Tinycast 每次启动命令都销毁旧 JSContext，离开搜索界面即锁定。会话内的自动锁定计时器只在界面持续打开时起作用，但钥匙串记忆模式下自动锁定窗口同时跨启动生效：上次解锁时间记录在 `$TMPDIR/raycast-enpass-unlock-stamp`（0600 权限，不含任何秘密），距上次解锁超过该窗口后，重新打开会要求输入主密码而非静默解锁。
 - **剪贴板倒计时清除只在命令会话存活期间有效**：复制密码后若立即离开命令，JSContext 被销毁，30 秒定时器随之消失，剪贴板将不会被自动清除（内容本身带 concealed 标记，仍不进 Tinycast 剪贴板历史）。需要倒计时保障时请保持界面打开。
 - **粘贴动作经过系统剪贴板**（Raycast API 的 `Clipboard.paste` 如此），瞬时内容可能被剪贴板历史捕获；介意请用默认的复制动作（带 concealed 标记）。
 - **fn 修饰键依赖 Tinycast 支持**：`@raycast/api` 类型层面不认识 `fn`，扩展以类型断言传入；在原生 Raycast 中 fn↩ 无效。

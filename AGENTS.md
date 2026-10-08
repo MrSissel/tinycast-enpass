@@ -75,9 +75,12 @@ published, `gh release delete v<X>` first.
   survives into the next run — the snapshot's lifetime IS the command session.
   Cross-command "lock" works only because a new launch preempts the old context.
 - **Secrets are never persisted.** No LocalStorage, no Cache, no disk, no logs,
-  no recent-items. The single allowed persistence is the login-Keychain master
-  password in `masterpw-keychain` mode (`src/lib/keychain.ts`,
-  service `raycast-enpass`), deleted by Lock Vault.
+  no recent-items. The only two files that survive a command session: the
+  login-Keychain master password in `masterpw-keychain` mode
+  (`src/lib/keychain.ts`, service `raycast-enpass`, deleted by Lock Vault) and
+  the non-secret unlock timestamp `$TMPDIR/raycast-enpass-unlock-stamp`
+  (`src/lib/idle-lock.ts`, 0600) that gates the silent Keychain unlock once
+  the auto-lock window has passed.
 - **Every sensitive copy goes through `copyValue(…, sensitive=true)`**
   (`src/lib/actions.ts`) → `Clipboard.copy(…, { concealed: true })`. Never add
   a raw `Clipboard.copy` for a secret. Usernames are non-sensitive on purpose.

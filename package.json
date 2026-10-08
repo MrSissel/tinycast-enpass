@@ -151,7 +151,7 @@
       "required": true,
       "default": "30",
       "title": "Auto-Lock Session",
-      "description": "The in-memory snapshot is wiped after this time. 'After each use' locks right after every copy/paste action.",
+      "description": "The in-memory snapshot is wiped after this time. With the Keychain unlock method, the silent unlock is also refused once this window has passed since the last unlock — the master password is asked again. 'After each use' locks right after every copy/paste action.",
       "data": [
         {
           "title": "Never",
