@@ -78,18 +78,21 @@
 已按 [Tinycast 官方文档](https://github.com/abue-ammar/tinycast/blob/main/docs/features/extensions.md) 核实：
 
 1. 安装后端：`brew install enpass-cli`
-2. 构建扩展：
-   ```sh
-   cd tinycast-enpass
-   npm install
-   npm run build   # 产出 dist/：package.json + 三个 <command>.js + assets/
-   ```
-3. **Settings → Extensions**：打开扩展总开关（默认关闭，开启即同意运行第三方代码）。
-4. **Install New → Add from folder** → 选择本项目的 **`dist/` 目录**（不是项目根目录——Tinycast 要的是"manifest + 构建产物"目录）。
-5. **Settings → Extensions → Enpass**：在每个命令行上设置 Alias（相当于 Raycast 的 keyword）：`enp` / `enp-lock` / `enp-refresh`；旁边可录全局快捷键。扩展标题 "Enpass" 本身也是所有命令的搜索词。
-6. 首次运行 Search Vault 会自动自检：CLI 不存在或保险库目录无 `vault.enpassdb` 时给出明确指引（如 `brew install enpass-cli`、Enpass → Settings → Advanced → Data Location），不会静默失败。
+2. **Settings → Extensions**：打开扩展总开关（默认关闭，开启即同意运行第三方代码）。
+3. **Install New → Install from GitHub** → 填入 `MrSissel/tinycast-enpass`。Tinycast 会自行 clone、装依赖并运行 `ray build`，只保留构建产物。需要 Mac 上有 Node 和 npm/pnpm/Yarn/Bun 之一。
+4. **Settings → Extensions → Enpass**：在每个命令行上设置 Alias（相当于 Raycast 的 keyword）：`enp` / `enp-lock` / `enp-refresh`；旁边可录全局快捷键。扩展标题 "Enpass" 本身也是所有命令的搜索词。
+5. 首次运行 Search Vault 会自动自检：CLI 不存在或保险库目录无 `vault.enpassdb` 时给出明确指引（如 `brew install enpass-cli`、Enpass → Settings → Advanced → Data Location），不会静默失败。
 
-**更新**：folder 安装的扩展不参与自动更新。改动代码后重新 `npm run build`，再 Add from folder 一次即覆盖安装（偏好项保留）。
+也可以从源码构建后 **Install New → Add from folder** → 选择 **`dist/` 目录**（不是项目根目录——Tinycast 要的是"manifest + 构建产物"目录）：
+
+```sh
+git clone https://github.com/MrSissel/tinycast-enpass.git
+cd tinycast-enpass
+npm install
+npm run build   # 产出 dist/：package.json + 三个 <command>.js + assets/
+```
+
+**更新**：两种方式都不参与自动更新——重复同一安装步骤即可覆盖到新版本（偏好项保留）。Releases 页的 `enpass-tinycast.zip` 解压后就是同样的 `dist/` 布局。
 
 ## 开发
 

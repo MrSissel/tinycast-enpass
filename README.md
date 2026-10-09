@@ -78,18 +78,21 @@ The password form is rendered as the command's root screen (works around Tinycas
 Verified against the [Tinycast extensions doc](https://github.com/abue-ammar/tinycast/blob/main/docs/features/extensions.md):
 
 1. Install the backend: `brew install enpass-cli`
-2. Build the extension:
-   ```sh
-   cd tinycast-enpass
-   npm install
-   npm run build   # produces dist/: package.json + three <command>.js + assets/
-   ```
-3. **Settings → Extensions**: turn extensions on (off by default; enabling consents to running third-party code).
-4. **Install New → Add from folder** → select this project's **`dist/` directory** (not the project root — Tinycast wants the "manifest + built bundles" directory).
-5. **Settings → Extensions → Enpass**: set an Alias on each command row (Tinycast's keyword equivalent): `enp` / `enp-lock` / `enp-refresh`; a global hotkey recorder sits beside it. The extension title "Enpass" is itself a search term for all its commands.
-6. First run self-checks before unlocking: missing CLI or missing `vault.enpassdb` produces actionable guidance (e.g. `brew install enpass-cli`, Enpass → Settings → Advanced → Data Location) instead of silent failure.
+2. **Settings → Extensions**: turn extensions on (off by default; enabling consents to running third-party code).
+3. **Install New → Install from GitHub** → paste `MrSissel/tinycast-enpass`. Tinycast clones, installs dependencies and runs `ray build` itself; only the build is kept. Requires Node plus npm/pnpm/Yarn/Bun on the Mac.
+4. **Settings → Extensions → Enpass**: set an Alias on each command row (Tinycast's keyword equivalent): `enp` / `enp-lock` / `enp-refresh`; a global hotkey recorder sits beside it. The extension title "Enpass" is itself a search term for all its commands.
+5. First run self-checks before unlocking: missing CLI or missing `vault.enpassdb` produces actionable guidance (e.g. `brew install enpass-cli`, Enpass → Settings → Advanced → Data Location) instead of silent failure.
 
-**Updates**: folder installs don't auto-update. After changing code, `npm run build` and Add from folder again (preferences carry over).
+Or build from source and **Install New → Add from folder** → select the **`dist/` directory** (not the project root):
+
+```sh
+git clone https://github.com/MrSissel/tinycast-enpass.git
+cd tinycast-enpass
+npm install
+npm run build   # produces dist/: package.json + three <command>.js + assets/
+```
+
+**Updates**: installs don't auto-update — repeat the same install step to pick up a new version (preferences carry over). Release zips (`enpass-tinycast.zip`) on the Releases page unzip to the same `dist/` layout.
 
 ## Development
 
