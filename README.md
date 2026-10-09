@@ -133,4 +133,4 @@ Tests only ever touch the public test vault shipped with enpass-cli (`test/fixtu
 
 ## License
 
-MIT. Not affiliated with or endorsed by Enpass Technologies; Enpass is a trademark of its respective owner.
+MIT. Unofficial and not affiliated with or endorsed by the makers of Enpass, Raycast, or Tinycast; all product names are trademarks of their respective owners.

@@ -134,4 +134,4 @@ npm run build       # ray build -e dist -o dist → dist/
 
 ## License
 
-MIT。不隶属于 Enpass Technologies；Enpass 是其所有者的商标。
+MIT。非官方项目，不隶属于 Enpass、Raycast 或 Tinycast 的厂商，也未获其背书；所有产品名称均为其各自所有者的商标。
