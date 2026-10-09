@@ -93,8 +93,10 @@ published, `gh release delete v<X>` first.
   panel dispatches plain ↩ only** — modifier+Return shortcuts (⌘↩/⌃↩/⇧↩)
   beep or fall through to the search field, and panel-listed list shortcuts
   (⌘R/⌘L) don't fire while the panel is open (observed on 0.11.12,
-  2026-10-09; stock Raycast had the same bug class and fixed it, so keep
-  declaring standard shortcuts and let Tinycast catch up);
+  2026-10-09; fixed upstream in v0.11.16-beta.114, PR #1400 — the panel's
+  search field held focus so the chord never reached the extension; stable
+  channel pending. Stock Raycast had the same bug class and fixed it, so
+  keep declaring standard shortcuts and let Tinycast catch up);
   `List.EmptyView`
   actions never fire — use real `List.Item`s for primary actions; `fn`
   modifier is Tinycast-only (type assertion in `vault-command.tsx`).
