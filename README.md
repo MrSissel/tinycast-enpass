@@ -25,7 +25,7 @@ The backend is [enpass-cli](https://github.com/hazcod/enpass-cli) (Go, reads the
 | ⌃↩ | Open website (http/https only — every other scheme is refused) |
 | ⇧↩ | Field detail list: ↩ copy field, ⌘↩ paste field, ⌃↩ open a URL field |
 | ⌘R | Rebuild the snapshot in place (re-verify, without leaving the command) |
-| ⌘L | Lock immediately (wipe the in-memory snapshot) |
+| ⌘L | Lock immediately (wipe the in-memory snapshot; with a timed auto-lock in Keychain mode, also ends the idle window — re-unlocking asks for the master password) |
 
 Passwords, PINs, card numbers, recovery codes and TOTP secrets are masked (`••••••••`) in every list UI; TOTP fields show only the current 6-digit code in the detail view.
 
@@ -127,7 +127,7 @@ Tests only ever touch the public test vault shipped with enpass-cli (`test/fixtu
 - [ ] **Open website**: ⌃↩ opens the right URL in the default browser; the action is absent on entries without a URL.
 - [ ] **Field detail**: ⇧↩ → sensitive fields masked; ↩ copies a field, ⌘↩ pastes it.
 - [ ] **In-place refresh**: ⌘R → re-verify → list rebuilt; rename an entry in Enpass, then ⌘R shows the new title.
-- [ ] **Lock (both paths)**: ① ⌘L in the list → back to the unlock screen; ② `enp-lock` → HUD → the next `enp` requires re-auth. Leaving the palette (Esc) and re-entering also requires it.
+- [ ] **Lock (both paths)**: ① ⌘L in the list → back to the unlock screen (Keychain mode with a timed auto-lock: the master password form appears, a silent reopen would be a bug); ② `enp-lock` → HUD → the next `enp` requires re-auth. Leaving the palette (Esc) and re-entering also requires it.
 - [ ] **Refresh**: `enp-refresh` → re-verify (silent in Keychain mode) → lands directly in the search list.
 - [ ] **Master-password mode** (optional): switch the preference to MASTERPW → `enp` shows the form → a wrong password fails with a short clear error, the right one unlocks; the password never shows up in `ps`/Activity Monitor command lines.
 

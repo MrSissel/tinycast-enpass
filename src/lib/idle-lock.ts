@@ -27,6 +27,10 @@ export function touchUnlock(now = Date.now()): void {
   }
 }
 
+// In-list ⌘L "Lock Vault": end the trusted window NOW, so the silent re-unlock
+// that would follow the wipe is refused and the password form appears instead.
+export const expireUnlock = (): void => touchUnlock(0);
+
 export function idleLockExpired(
   mode: AutoLock,
   read: () => number | null = lastUnlock,

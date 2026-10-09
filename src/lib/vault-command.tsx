@@ -10,6 +10,7 @@ import {
 } from "@raycast/api";
 import { useEffect, useState } from "react";
 import { copyValue, openWebsite, pasteValue } from "./actions";
+import { expireUnlock } from "./idle-lock";
 import {
   isSensitiveField,
   MASK,
@@ -191,7 +192,13 @@ function VaultListItem({
               title="Lock Vault"
               icon={Icon.Lock}
               shortcut={{ modifiers: ["cmd"], key: "l" }}
-              onAction={() => void lock()}
+              onAction={() => {
+                // End the idle window first, so the Keychain-mode re-unlock
+                // after the wipe asks for the master password instead of
+                // silently reopening (which looked exactly like a refresh).
+                expireUnlock();
+                void lock();
+              }}
             />
           </ActionPanel.Section>
         </ActionPanel>

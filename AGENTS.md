@@ -89,7 +89,13 @@ published, `gh release delete v<X>` first.
   the consumption code (verified: Mach-O has no autofocus symbols while
   sibling property names are present; implemented on upstream main, pending
   release) — render unlock forms as root screens anyway, and Tab/↓ to focus;
-  ↩ submits from non-text controls, ⌘↩ from text fields; `List.EmptyView`
+  ↩ submits from non-text controls, ⌘↩ from text fields; **the ⌘K action
+  panel dispatches plain ↩ only** — modifier+Return shortcuts (⌘↩/⌃↩/⇧↩)
+  beep or fall through to the search field, and panel-listed list shortcuts
+  (⌘R/⌘L) don't fire while the panel is open (observed on 0.11.12,
+  2026-10-09; stock Raycast had the same bug class and fixed it, so keep
+  declaring standard shortcuts and let Tinycast catch up);
+  `List.EmptyView`
   actions never fire — use real `List.Item`s for primary actions; `fn`
   modifier is Tinycast-only (type assertion in `vault-command.tsx`).
 - **Tests touch ONLY `test/fixtures/testvault`** (public hazcod/enpass-cli test
