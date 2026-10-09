@@ -80,7 +80,7 @@
 1. 安装后端：`brew install enpass-cli`
 2. 构建扩展：
    ```sh
-   cd raycast-enpass
+   cd tinycast-enpass
    npm install
    npm run build   # 产出 dist/：package.json + 三个 <command>.js + assets/
    ```

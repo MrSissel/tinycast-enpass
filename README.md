@@ -80,7 +80,7 @@ Verified against the [Tinycast extensions doc](https://github.com/abue-ammar/tin
 1. Install the backend: `brew install enpass-cli`
 2. Build the extension:
    ```sh
-   cd raycast-enpass
+   cd tinycast-enpass
    npm install
    npm run build   # produces dist/: package.json + three <command>.js + assets/
    ```
