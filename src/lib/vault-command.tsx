@@ -4,7 +4,6 @@ import {
   Icon,
   Keyboard,
   List,
-  showHUD,
   showToast,
   Toast,
 } from "@raycast/api";
@@ -33,9 +32,11 @@ import { LockedList } from "./unlock-view";
 // session: leaving the palette locks the vault for free. Both Search Vault and
 // Refresh Vault render this; Refresh just auto-starts the unlock prompt.
 
-// ponytail: fn is a Tinycast-supported modifier; @raycast/api types only know cmd/ctrl/opt/shift.
-const FN_RETURN: Keyboard.Shortcut = {
-  modifiers: ["fn" as Keyboard.KeyModifier],
+// ⇧⌘↩: the one Return chord left (⌘/⌥/⌃/⇧ are taken) that both hosts
+// dispatch — fn↩ was Tinycast-only and renders as an untriggerable tofu
+// box on stock Raycast.
+const SECONDARY_RETURN: Keyboard.Shortcut = {
+  modifiers: ["cmd", "shift"],
   key: "return",
 };
 
@@ -51,7 +52,7 @@ const ICON_BY_CATEGORY: Record<string, Icon> = {
 
 export function VaultCommand(props: {
   autoStart: boolean;
-  hudVerb: "unlocked" | "refreshed";
+  verb: "unlocked" | "refreshed";
 }) {
   const [snapshot, setSnapshot] = useState(getSnapshot());
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -63,7 +64,12 @@ export function VaultCommand(props: {
         autoStart={props.autoStart || isRefreshing}
         onSuccess={async (n) => {
           setIsRefreshing(false);
-          await showHUD(`Vault ${props.hudVerb} — ${n} items`);
+          // showToast, not showHUD: showHUD dismisses the window on stock
+          // Raycast, leaving the freshly unlocked list hidden.
+          await showToast({
+            style: Toast.Style.Success,
+            title: `Vault ${props.verb} — ${n} items`,
+          });
         }}
       />
     );
@@ -140,14 +146,14 @@ function VaultListItem({
               <Action
                 title="Paste Password"
                 icon={Icon.Clipboard}
-                shortcut={FN_RETURN}
+                shortcut={SECONDARY_RETURN}
                 onAction={pastePassword}
               />
             ) : (
               <Action
                 title="Copy Password"
                 icon={Icon.Clipboard}
-                shortcut={FN_RETURN}
+                shortcut={SECONDARY_RETURN}
                 onAction={copyPassword}
               />
             ))}

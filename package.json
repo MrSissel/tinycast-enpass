@@ -1,7 +1,9 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "enpass",
+  "author": "mrsissel",
   "title": "Enpass",
+  "description": "Search an Enpass 6 vault and copy secrets without opening Enpass.",
   "icon": "icon.png",
   "license": "MIT",
   "keywords": [
@@ -103,7 +105,7 @@
       "required": true,
       "default": "copy",
       "title": "Default ↩ Action",
-      "description": "What ↩ does with the password. fn↩ always does the opposite.",
+      "description": "What ↩ does with the password. ⇧⌘↩ always does the opposite.",
       "data": [
         {
           "title": "Copy to clipboard",

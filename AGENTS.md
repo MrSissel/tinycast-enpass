@@ -21,9 +21,11 @@ plain `v0.2.0` ships stable.
 
 Lint is `eslint` + `prettier` directly, NOT `ray lint`: this is a private
 extension, and `ray lint`'s manifest validation hard-requires a raycast.com
-author account (its `--relaxed` flag does not exempt it). If the extension is
-ever submitted to the Raycast Store, restore an `author` field with a real
-raycast.com username and switch CI to `ray lint`. TypeScript must stay on 5.x
+author account (its `--relaxed` flag does not exempt it). The manifest carries
+`author`/`description` so stock Raycast can import the built `dist/` folder —
+that's import compat only; if the extension is ever submitted to the Raycast
+Store, `author` must become a real raycast.com username and CI switches to
+`ray lint`. TypeScript must stay on 5.x
 — typescript-eslint (inside @raycast/eslint-config) hard-throws on TS 7.
 
 Tinycast installs the extension via Settings → Extensions → Add from folder →
@@ -84,22 +86,24 @@ published, `gh release delete v<X>` first.
 - **Every sensitive copy goes through `copyValue(…, sensitive=true)`**
   (`src/lib/actions.ts`) → `Clipboard.copy(…, { concealed: true })`. Never add
   a raw `Clipboard.copy` for a secret. Usernames are non-sensitive on purpose.
-- **Tinycast form quirks**: v0.11.12 (release binary) has no form auto-focus at
-  all — the JS runtime forwards `autoFocus` but the release's Swift side lacks
-  the consumption code (verified: Mach-O has no autofocus symbols while
-  sibling property names are present; implemented on upstream main, pending
-  release) — render unlock forms as root screens anyway, and Tab/↓ to focus;
+- **Tinycast form quirks**: extension forms never auto-focus (verified
+  0.11.12 → 0.11.19 stable and upstream main, 2026-10-11; no open PR) — the
+  JS runtime forwards `autoFocus` fine, and Swift consumes it in
+  `ExtensionFormView.onAppear { focus(screen.autoFocusedField) }`, but
+  `.onAppear` fires before the panel/AppKit picks a first responder, so that
+  pick wins. Same bug class upstream fixed for its own native dialogs in PR
+  #1369 (moved to `.task` + `Task.yield()`), never applied to extension
+  forms — render unlock forms as root screens anyway, and Tab/↓ to focus;
   ↩ submits from non-text controls, ⌘↩ from text fields; **the ⌘K action
   panel dispatches plain ↩ only** — modifier+Return shortcuts (⌘↩/⌃↩/⇧↩)
   beep or fall through to the search field, and panel-listed list shortcuts
   (⌘R/⌘L) don't fire while the panel is open (observed on 0.11.12,
-  2026-10-09; fixed upstream in v0.11.16-beta.114, PR #1400 — the panel's
-  search field held focus so the chord never reached the extension; stable
-  channel pending. Stock Raycast had the same bug class and fixed it, so
+  2026-10-09; fixed upstream in PR #1400 — the panel's
+  search field held focus so the chord never reached the extension;
+  shipped in stable v0.11.19. Stock Raycast had the same bug class and fixed it, so
   keep declaring standard shortcuts and let Tinycast catch up);
   `List.EmptyView`
-  actions never fire — use real `List.Item`s for primary actions; `fn`
-  modifier is Tinycast-only (type assertion in `vault-command.tsx`).
+  actions never fire — use real `List.Item`s for primary actions.
 - **Tests touch ONLY `test/fixtures/testvault`** (public hazcod/enpass-cli test
   vault, password `absolutely-No-clue`, passed via MASTERPW env). Never point a
   test or a dev script at `~/Library/Containers/in.sinew.Enpass-Desktop/…` or

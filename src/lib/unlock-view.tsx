@@ -137,10 +137,11 @@ export function LockedList(props: {
   }
 
   // Master-password mode renders the form AS the command's root screen, not
-  // via Action.Push: Tinycast 0.11.12 does not auto-focus pushed forms
-  // (autoFocusedField machinery exists but never lands a first responder),
-  // while a root form does — and the keyboard-first user gets the password
-  // field with zero navigation.
+  // via Action.Push: Tinycast never auto-focuses extension forms (verified
+  // 0.11.12–0.11.19, unfixed upstream — ExtensionFormView requests focus in
+  // onAppear and loses the panel's first-responder pick), and a pushed form
+  // only adds a navigation step on top. Root screen + one Tab/↓ is the
+  // least-bad path for the keyboard-first user.
   if (method === "masterpw") {
     return <PasswordUnlockForm pushed={false} onSuccess={props.onSuccess} />;
   }

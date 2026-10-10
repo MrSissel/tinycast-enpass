@@ -6,5 +6,5 @@ import { VaultCommand } from "./lib/vault-command";
 // land directly in the search list. Inside Search Vault, ⌘R rebuilds the
 // snapshot without leaving the command.
 export default function RefreshVault() {
-  return <VaultCommand autoStart hudVerb="refreshed" />;
+  return <VaultCommand autoStart verb="refreshed" />;
 }
