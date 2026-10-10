@@ -40,6 +40,14 @@ const SECONDARY_RETURN: Keyboard.Shortcut = {
   key: "return",
 };
 
+// ⌥⌘↩, never a ⌃ chord: AppKit's text system claims Ctrl+Return for the
+// context menu, so ⌃↩ never reaches the extension while the search field
+// holds focus (observed on Tinycast 0.11.19).
+const OPEN_WEBSITE_RETURN: Keyboard.Shortcut = {
+  modifiers: ["cmd", "opt"],
+  key: "return",
+};
+
 const ICON_BY_CATEGORY: Record<string, Icon> = {
   login: Icon.Key,
   creditcard: Icon.CreditCard,
@@ -177,7 +185,7 @@ function VaultListItem({
             <Action
               title="Open Website"
               icon={Icon.Globe}
-              shortcut={{ modifiers: ["ctrl"], key: "return" }}
+              shortcut={OPEN_WEBSITE_RETURN}
               onAction={() => openWebsite(url)}
             />
           )}
@@ -248,7 +256,7 @@ function FieldsList({ item }: { item: VaultItem }) {
                   <Action
                     title="Open Website"
                     icon={Icon.Globe}
-                    shortcut={{ modifiers: ["ctrl"], key: "return" }}
+                    shortcut={OPEN_WEBSITE_RETURN}
                     onAction={() => openWebsite(value)}
                   />
                 )}

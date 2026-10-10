@@ -103,7 +103,10 @@ published, `gh release delete v<X>` first.
   shipped in stable v0.11.19. Stock Raycast had the same bug class and fixed it, so
   keep declaring standard shortcuts and let Tinycast catch up);
   `List.EmptyView`
-  actions never fire — use real `List.Item`s for primary actions.
+  actions never fire — use real `List.Item`s for primary actions; **never bind
+  a ⌃ chord** — AppKit's text system claims Ctrl+Return for the context menu,
+  so it never reaches the extension while the search field holds focus
+  (observed on 0.11.19, 2026-10-11).
 - **Tests touch ONLY `test/fixtures/testvault`** (public hazcod/enpass-cli test
   vault, password `absolutely-No-clue`, passed via MASTERPW env). Never point a
   test or a dev script at `~/Library/Containers/in.sinew.Enpass-Desktop/…` or

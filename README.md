@@ -22,8 +22,8 @@ The backend is [enpass-cli](https://github.com/hazcod/enpass-cli) (Go, reads the
 | ⇧⌘↩ | The opposite of the default action (paste when default is copy, and vice versa) |
 | ⌘↩ | Copy username |
 | ⌥↩ | Copy the current TOTP code (computed locally from the secret via RFC 6238) |
-| ⌃↩ | Open website (http/https only — every other scheme is refused) |
-| ⇧↩ | Field detail list: ↩ copy field, ⌘↩ paste field, ⌃↩ open a URL field |
+| ⌥⌘↩ | Open website (http/https only — every other scheme is refused) |
+| ⇧↩ | Field detail list: ↩ copy field, ⌘↩ paste field, ⌥⌘↩ open a URL field |
 | ⌘R | Rebuild the snapshot in place (re-verify, without leaving the command) |
 | ⌘L | Lock immediately (wipe the in-memory snapshot; with a timed auto-lock in Keychain mode, also ends the idle window — re-unlocking asks for the master password) |
 
