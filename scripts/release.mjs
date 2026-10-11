@@ -44,7 +44,11 @@ if (process.argv[1]?.endsWith("release.mjs")) {
   const latest = latestTag();
   const tag = computeNextTag(latest, channel);
   console.log(`${latest ?? "(no tags yet)"} → ${tag}`);
-  execFileSync("git", ["tag", tag], { stdio: "inherit" });
+  // Annotated tag: an editor opens for the message, which the Release
+  // workflow uses as the GitHub release body — write it for humans
+  // (what changed and why), an empty message aborts the tag.
+  console.log("Write the release notes in the editor that opens now.");
+  execFileSync("git", ["tag", "-a", tag], { stdio: "inherit" });
   execFileSync("git", ["push", "origin", tag], { stdio: "inherit" });
   console.log("Release workflow triggered — watch with: gh run watch");
 }

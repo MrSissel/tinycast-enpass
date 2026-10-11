@@ -29,10 +29,16 @@ jobs:
         working-directory: dist
         run: zip -r "$GITHUB_WORKSPACE/enpass-tinycast.zip" .
 
+      # The annotated tag's message is the release notes; a lightweight tag
+      # falls back to its commit message (still readable).
+      - name: Use the tag message as release notes
+        run: git tag -l --format='%(contents)' "$GITHUB_REF_NAME" > release-notes.md
+
       # Two channels, one workflow: a semver prerelease suffix in the tag
       # (v0.2.0-beta.1) marks the release as prerelease; plain v0.2.0 ships stable.
       - uses: softprops/action-gh-release@v2
         with:
           files: enpass-tinycast.zip
+          body_path: release-notes.md
           generate_release_notes: true
           prerelease: ${{ contains(github.ref_name, '-') }}

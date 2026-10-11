@@ -47,8 +47,13 @@ Tags are the only version source (the manifest carries no version field).
      marked **prerelease** on GitHub; "Latest" untouched.
    - **Stable**: `npm run release:stable` — cuts the base version off a beta
      line, or bumps minor from a stable tag. Full release, becomes "Latest".
-   Manual `git tag vX.Y.Z[-beta.N] && git push origin <tag>` works the same;
-   the helpers just do the numbering (`scripts/release.mjs`).
+   The helper makes an **annotated** tag and opens your editor for the
+   message — that message becomes the GitHub release body (the workflow
+   reads it via `git tag --format='%(contents)'` into `body_path`), so write
+   it for humans: what changed and why, grouped by theme, no commit hashes.
+   An empty message aborts the tag. Manual equivalent:
+   `git tag -a vX.Y.Z[-beta.N] && git push origin <tag>` (a lightweight tag
+   falls back to its commit message as the body).
 3. Verify: `gh run watch`, then `gh release view v<tag>` — the asset
    `enpass-tinycast.zip` must be attached.
 4. Install/update in Tinycast from the release zip (or a local
