@@ -87,13 +87,21 @@ published, `gh release delete v<X>` first.
   (`src/lib/actions.ts`) → `Clipboard.copy(…, { concealed: true })`. Never add
   a raw `Clipboard.copy` for a secret. Usernames are non-sensitive on purpose.
 - **Tinycast form quirks**: extension forms never auto-focus (verified
-  0.11.12 → 0.11.19 stable and upstream main, 2026-10-11; no open PR) — the
+  0.11.12 → 0.11.19 stable and upstream main, 2026-10-11; upstream issue
+  abue-ammar/tinycast#1495 closed **wontfix** — "handle that in your
+  extension", but the runtime has no imperative focus API. Worse: field focus
+  follows the palette selection via `onChange`, and a single-field form can
+  never change selection (the palette intercepts Tab at the root and no-ops
+  it there), so **never design a single-field form for Tinycast** — the
+  Keychain-mode unlock form carries a real "Remember in Keychain" checkbox
+  so ↓ then ↑ / ⇥ then ⇧⇥ can walk focus onto the password field. The
   JS runtime forwards `autoFocus` fine, and Swift consumes it in
   `ExtensionFormView.onAppear { focus(screen.autoFocusedField) }`, but
   `.onAppear` fires before the panel/AppKit picks a first responder, so that
   pick wins. Same bug class upstream fixed for its own native dialogs in PR
   #1369 (moved to `.task` + `Task.yield()`), never applied to extension
-  forms — render unlock forms as root screens anyway, and Tab/↓ to focus;
+  forms — render unlock forms as root screens anyway (a pushed form adds a
+  navigation step on top);
   ↩ submits from non-text controls, ⌘↩ from text fields; **the ⌘K action
   panel dispatches plain ↩ only** — modifier+Return shortcuts (⌘↩/⌃↩/⇧↩)
   beep or fall through to the search field, and panel-listed list shortcuts

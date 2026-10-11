@@ -22,7 +22,10 @@ export class PasswordRequiredError extends Error {
 // First-run preflight (hard requirement): verify the CLI works and the vault
 // directory contains vault.enpassdb BEFORE attempting a snapshot, and fail with
 // actionable guidance — never a raw log dump.
-export async function unlock(masterPassword?: string): Promise<number> {
+export async function unlock(
+  masterPassword?: string,
+  remember = true,
+): Promise<number> {
   const p = prefs();
 
   const cliPath = resolveCliPath(p);
@@ -69,7 +72,8 @@ export async function unlock(masterPassword?: string): Promise<number> {
     });
     if (
       p.unlockMethod === "masterpw-keychain" &&
-      masterPassword !== undefined
+      masterPassword !== undefined &&
+      remember
     ) {
       // Persist only AFTER a successful unlock proves the password right.
       // Best-effort: a failed write just means the form appears again next time.

@@ -36,9 +36,10 @@ export function unlockErrorText(e: unknown): string {
 export async function runUnlock(
   masterPassword: string | undefined,
   onSuccess: (itemCount: number) => Promise<void>,
+  remember = true,
 ): Promise<void> {
   try {
-    const itemCount = await unlock(masterPassword);
+    const itemCount = await unlock(masterPassword, remember);
     await onSuccess(itemCount);
   } catch (e) {
     await showToast({
@@ -53,6 +54,7 @@ export async function runUnlock(
 // MASTERPW set, enpass-cli skips store.Read (no fingerprint needed this once),
 // unlocks with the password and writes the derived key to the Keychain —
 // afterwards Touch ID alone unlocks.
+
 export function PasswordUnlockForm(props: {
   pushed: boolean;
   onSuccess: (itemCount: number) => Promise<void>;
@@ -72,7 +74,10 @@ export function PasswordUnlockForm(props: {
         <ActionPanel>
           <Action.SubmitForm
             title={method === "touchid" ? "Enroll & Unlock" : "Unlock Vault"}
-            onSubmit={async (values: { password?: string }) => {
+            onSubmit={async (values: {
+              password?: string;
+              remember?: boolean;
+            }) => {
               const password = values.password ?? "";
               if (!password) {
                 await showToast({
@@ -84,10 +89,14 @@ export function PasswordUnlockForm(props: {
               setIsUnlocking(true);
               // The password is passed to enpass-cli via the MASTERPW environment
               // variable of that single spawn — never an argument, never stored.
-              await runUnlock(password, async (n) => {
-                if (props.pushed) pop();
-                await props.onSuccess(n);
-              });
+              await runUnlock(
+                password,
+                async (n) => {
+                  if (props.pushed) pop();
+                  await props.onSuccess(n);
+                },
+                values.remember ?? true,
+              );
               setIsUnlocking(false);
             }}
           />
@@ -100,12 +109,27 @@ export function PasswordUnlockForm(props: {
         placeholder="Enpass master password"
         autoFocus
       />
+      {
+        // Tinycast moves form focus only when the palette selection *changes*,
+        // which a one-field form can never do (upstream wontfix:
+        // abue-ammar/tinycast#1495) — the password field needs a sibling so
+        // ↓↑/⇥ can carry focus onto it. The checkbox earns its keep as a real
+        // per-unlock opt-out, not just a focus rung.
+        method === "masterpw-keychain" && (
+          <Form.Checkbox
+            id="remember"
+            title="Remember"
+            label="Store in Keychain — afterwards enp opens instantly"
+            defaultValue={true}
+          />
+        )
+      }
       <Form.Description
         text={
           method === "touchid"
             ? "First-time enrollment: enpass-cli stores the derived vault key in your macOS Keychain (service 'enpass-cli'); afterwards Touch ID alone unlocks. Passed via the MASTERPW environment variable, never stored by this extension. Press ⌘↩ to unlock."
             : method === "masterpw-keychain"
-              ? "Stored in your login Keychain after this first success (service 'raycast-enpass') — afterwards enp opens instantly. enp-lock removes it again. Press ⌘↩ to unlock."
+              ? "Stored in your login Keychain after a success (service 'raycast-enpass'); enp-lock removes it again. Press ⌘↩ to unlock. On Tinycast: if the password field has no caret, press ↓ then ↑."
               : "Used once for this unlock via the MASTERPW environment variable. Never stored, never on the command line. Press ⌘↩ to unlock."
         }
       />
@@ -137,11 +161,7 @@ export function LockedList(props: {
   }
 
   // Master-password mode renders the form AS the command's root screen, not
-  // via Action.Push: Tinycast never auto-focuses extension forms (verified
-  // 0.11.12–0.11.19, unfixed upstream — ExtensionFormView requests focus in
-  // onAppear and loses the panel's first-responder pick), and a pushed form
-  // only adds a navigation step on top. Root screen + one Tab/↓ is the
-  // least-bad path for the keyboard-first user.
+  // via Action.Push: a pushed form only adds a navigation step on top.
   if (method === "masterpw") {
     return <PasswordUnlockForm pushed={false} onSuccess={props.onSuccess} />;
   }
