@@ -112,9 +112,13 @@ export function PasswordUnlockForm(props: {
       {
         // Tinycast moves form focus only when the palette selection *changes*,
         // which a one-field form can never do (upstream wontfix:
-        // abue-ammar/tinycast#1495) — the password field needs a sibling so
-        // ↓↑/⇥ can carry focus onto it. The checkbox earns its keep as a real
-        // per-unlock opt-out, not just a focus rung.
+        // abue-ammar/tinycast#1495). The Remember checkbox is the second
+        // focusable field: ⇥ cycles 0→1→0, so ⇥⇥ lands the caret on the
+        // password field (vertical arrows don't move across form rows).
+        // autoFocus stays on the password field — stock Raycast honors it;
+        // on Tinycast it loses a first-responder race and is harmless. The
+        // checkbox earns its keep as a real per-unlock opt-out, not just a
+        // focus rung.
         method === "masterpw-keychain" && (
           <Form.Checkbox
             id="remember"
@@ -124,15 +128,20 @@ export function PasswordUnlockForm(props: {
           />
         )
       }
-      <Form.Description
-        text={
-          method === "touchid"
-            ? "First-time enrollment: enpass-cli stores the derived vault key in your macOS Keychain (service 'enpass-cli'); afterwards Touch ID alone unlocks. Passed via the MASTERPW environment variable, never stored by this extension. Press ⌘↩ to unlock."
-            : method === "masterpw-keychain"
-              ? "Stored in your login Keychain after a success (service 'raycast-enpass'); enp-lock removes it again. Press ⌘↩ to unlock. On Tinycast: if the password field has no caret, press ↓ then ↑."
-              : "Used once for this unlock via the MASTERPW environment variable. Never stored, never on the command line. Press ⌘↩ to unlock."
-        }
-      />
+      {method === "masterpw-keychain" ? (
+        <>
+          <Form.Description text="⌘↩ to unlock — on Tinycast press ⇥ twice if the password field isn't focused." />
+          <Form.Description text="Stored in your login Keychain (service 'raycast-enpass') after a success; enp-lock removes it. Uncheck Remember to skip storing this time." />
+        </>
+      ) : (
+        <Form.Description
+          text={
+            method === "touchid"
+              ? "First-time enrollment: enpass-cli stores the derived vault key in your macOS Keychain (service 'enpass-cli'); afterwards Touch ID alone unlocks. Passed via the MASTERPW environment variable, never stored by this extension. Press ⌘↩ to unlock."
+              : "Used once for this unlock via the MASTERPW environment variable. Never stored, never on the command line. Press ⌘↩ to unlock (on Tinycast, click the field first)."
+          }
+        />
+      )}
     </Form>
   );
 }

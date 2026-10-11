@@ -94,7 +94,10 @@ published, `gh release delete v<X>` first.
   never change selection (the palette intercepts Tab at the root and no-ops
   it there), so **never design a single-field form for Tinycast** — the
   Keychain-mode unlock form carries a real "Remember in Keychain" checkbox
-  so ↓ then ↑ / ⇥ then ⇧⇥ can walk focus onto the password field. The
+  as the second focusable field, and ⇥⇥ (the palette's Tab cycle) lands on
+  the password field; vertical arrows don't move across form rows.
+  Single-field forms (masterpw mode, Touch ID enrollment) stay mouse-only.
+  The
   JS runtime forwards `autoFocus` fine, and Swift consumes it in
   `ExtensionFormView.onAppear { focus(screen.autoFocusedField) }`, but
   `.onAppear` fires before the panel/AppKit picks a first responder, so that
